@@ -14,7 +14,7 @@ func TransformRuntimeObjToUnstructured(obj runtime.Object) (*unstructured.Unstru
 	unstructObj := &unstructured.Unstructured{}
 	o, err := runtime.DefaultUnstructuredConverter.ToUnstructured(obj)
 	if err != nil {
-		return nil, fmt.Errorf("converts an object into map[string]interface{} representation failed:", err)
+		return nil, fmt.Errorf("converts an object into map[string]interface{} representation failed: %+v", err)
 	}
 	err = runtime.DefaultUnstructuredConverter.FromUnstructured(o, unstructObj)
 	if err != nil {
