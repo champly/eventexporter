@@ -1,0 +1,10 @@
+route:
+  match:
+  - namespace: "dmall-inner|dmall-outer"
+  routes:
+    - match:
+        - receiver: "alertmanager"
+receiverConfigs:
+  - name: alertmanager
+    config:
+      host: 10.49.18.83:9093
