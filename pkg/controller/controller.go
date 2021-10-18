@@ -65,6 +65,7 @@ func (ctrl *Controller) Reconcile(req api.WrapNamespacedName) (requeue api.NeedR
 	err = cli.Get(req.NamespacedName, e)
 	if err != nil {
 		if apierrors.IsNotFound(err) {
+			// maybe event deleted.
 			klog.Warningf("Cluster [%s] event %s not found", req.QName, req.NamespacedName.String())
 			return api.Done, 0, nil
 		}

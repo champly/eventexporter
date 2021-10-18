@@ -153,6 +153,7 @@ func getAlertManagerHost() (host string, err error) {
 	}
 
 	for _, svc := range svcList.Items {
+		// https://github.com/helm/charts/blob/f4f301ae450101b981805bd045451f08c0d74afa/stable/prometheus-operator/templates/alertmanager/service.yaml?_pjax=%23js-repo-pjax-container%2C%20div%5Bitemtype%3D%22http%3A%2F%2Fschema.org%2FSoftwareSourceCode%22%5D%20main%2C%20%5Bdata-pjax-container%5D#L44
 		if len(svc.Spec.Selector) > 0 && svc.Spec.Selector["app"] == "alertmanager" {
 			return fmt.Sprintf("%s.%s.svc", svc.Name, svc.Namespace), nil
 		}

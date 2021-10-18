@@ -8,6 +8,7 @@ import (
 
 	"github.com/symcn/api"
 	corev1 "k8s.io/api/core/v1"
+	apierrors "k8s.io/apimachinery/pkg/api/errors"
 	"k8s.io/apimachinery/pkg/api/meta"
 	"k8s.io/apimachinery/pkg/apis/meta/v1/unstructured"
 	"k8s.io/apimachinery/pkg/runtime/schema"
@@ -83,7 +84,15 @@ func (m *MetadataHandler) getUnstructedWithObjectReference(reference *corev1.Obj
 	// get resource from informer
 	o, err := informer.Lister().ByNamespace(reference.Namespace).Get(reference.Name)
 	if err != nil {
-		return nil, err
+		if !apierrors.IsNotFound(err) {
+			return nil, err
+		}
+		// maybe resource not define with namespace, should re-get without namespace.
+		// such as: node
+		o, err = informer.Lister().Get(reference.Name)
+		if err != nil {
+			return nil, err
+		}
 	}
 	return TransformRuntimeObjToUnstructured(o)
 }
@@ -102,17 +111,20 @@ func (m *MetadataHandler) getGenericInfomer(reference *corev1.ObjectReference) (
 
 	m.Lock()
 	defer m.Unlock()
-	if informer, ok = m.sharedInformerMap[mapping.Resource]; !ok {
-		informer = m.informers.ForResource(mapping.Resource)
-
-		go informer.Informer().Run(m.ctx.Done())
-
-		for !informer.Informer().HasSynced() {
-			klog.V(5).Infof("Wait %s informer cache sync.", mapping.Resource.String())
-			time.Sleep(time.Millisecond * 100)
-		}
-		m.sharedInformerMap[mapping.Resource] = informer
+	informer, ok = m.sharedInformerMap[mapping.Resource]
+	if ok {
+		return informer, nil
 	}
 
+	klog.Infof("Build cluster [%s] new dynamic informer for -> %s", m.cli.GetClusterCfgInfo().GetName(), mapping.Resource.String())
+	informer = m.informers.ForResource(mapping.Resource)
+
+	go informer.Informer().Run(m.ctx.Done())
+
+	for !informer.Informer().HasSynced() {
+		klog.V(5).Infof("Wait %s informer cache sync.", mapping.Resource.String())
+		time.Sleep(time.Millisecond * 100)
+	}
+	m.sharedInformerMap[mapping.Resource] = informer
 	return informer, nil
 }
