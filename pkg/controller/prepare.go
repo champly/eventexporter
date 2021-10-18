@@ -16,8 +16,9 @@ import (
 )
 
 func (ctrl *Controller) registryBeforAfterHandler() {
-	// start metrics server
+	// start metrics server & probe server
 	go startMetricsServer(ctrl.ctx)
+	go startProbleCheck(ctrl.ctx)
 
 	ctrl.RegistryBeforAfterHandler(func(ctx context.Context, cli api.MingleClient) error {
 		// build queue

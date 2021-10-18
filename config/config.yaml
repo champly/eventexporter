@@ -1,6 +1,5 @@
 route:
   match:
-  - namespace: "dmall-inner|dmall-outer"
   routes:
     - match:
         - receiver: "alertmanager"

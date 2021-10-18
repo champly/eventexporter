@@ -158,7 +158,7 @@ func getAlertManagerHost() (host string, err error) {
 	for _, svc := range svcList.Items {
 		// https://github.com/helm/charts/blob/f4f301ae450101b981805bd045451f08c0d74afa/stable/prometheus-operator/templates/alertmanager/service.yaml?_pjax=%23js-repo-pjax-container%2C%20div%5Bitemtype%3D%22http%3A%2F%2Fschema.org%2FSoftwareSourceCode%22%5D%20main%2C%20%5Bdata-pjax-container%5D#L44
 		if len(svc.Spec.Selector) > 0 && svc.Spec.Selector["app"] == "alertmanager" {
-			return fmt.Sprintf("%s.%s.svc", svc.Name, svc.Namespace), nil
+			return fmt.Sprintf("%s.%s.svc:9093", svc.Name, svc.Namespace), nil
 		}
 	}
 
@@ -188,7 +188,7 @@ func parseLabels(inputLabels []string) (models.LabelSet, error) {
 /*
  * {
  *     "annotations": {
- *         "message": "HPA dmall-inner/mid-cloud-test-provider-gz01b-green has been running at max replicas for longer than 15 minutes.",
+ *         "message": "HPA default/mid-cloud-test-provider-gz01b-green has been running at max replicas for longer than 15 minutes.",
  *         "runbook_url": "https://github.com/kubernetes-monitoring/kubernetes-mixin/tree/master/runbook.md#alert-name-kubehpamaxedout"
  *     },
  *     "endsAt": "2021-10-15T08:21:10.214Z",
@@ -205,7 +205,7 @@ func parseLabels(inputLabels []string) (models.LabelSet, error) {
  *         "state": "active"
  *     },
  *     "updatedAt": "2021-10-15T08:18:10.260Z",
- *     "generatorURL": "http://mid.prometheus.dmall.com/graph?g0.expr=kube_hpa_status_current_replicas%7Bjob%3D%22kube-state-metrics%22%2Cnamespace%3D~%22.%2A%22%7D+%3D%3D+kube_hpa_spec_max_replicas%7Bjob%3D%22kube-state-metrics%22%2Cnamespace%3D~%22.%2A%22%7D&g0.tab=1",
+ *     "generatorURL": "http://prometheus.default.com/graph?g0.expr=kube_hpa_status_current_replicas%7Bjob%3D%22kube-state-metrics%22%2Cnamespace%3D~%22.%2A%22%7D+%3D%3D+kube_hpa_spec_max_replicas%7Bjob%3D%22kube-state-metrics%22%2Cnamespace%3D~%22.%2A%22%7D&g0.tab=1",
  *     "labels": {
  *         "alertname": "KubeHpaMaxedOut",
  *         "cluster": "dev-tke-cd-mid",
@@ -214,7 +214,7 @@ func parseLabels(inputLabels []string) (models.LabelSet, error) {
  *         "hpa": "mid-cloud-test-provider-gz01b-green",
  *         "instance": "10.49.18.241:8080",
  *         "job": "kube-state-metrics",
- *         "namespace": "dmall-inner",
+ *         "namespace": "default",
  *         "pod": "monitor-dev-tke-cd-mid-kube-state-metrics-7f4586c4d9-wzssg",
  *         "service": "monitor-dev-tke-cd-mid-kube-state-metrics",
  *         "severity": "warning"
