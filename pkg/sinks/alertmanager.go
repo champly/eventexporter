@@ -176,7 +176,7 @@ func parseLabels(inputLabels []string) (models.LabelSet, error) {
 	for _, l := range inputLabels {
 		tmp := strings.Split(l, "=")
 		if len(tmp) != 2 {
-			klog.Warningf("inputLabels %s is not key=value and both not empty, skip it.", l)
+			klog.V(4).Infof("inputLabels %s is not key=value and both not empty, skip it.", l)
 			continue
 		}
 		labelSet[tmp[0]] = tmp[1]
