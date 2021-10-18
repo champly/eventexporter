@@ -7,6 +7,7 @@ import (
 	"net/url"
 	"strconv"
 	"strings"
+	"time"
 
 	"github.com/champly/eventexporter/pkg/kube"
 	"github.com/go-openapi/strfmt"
@@ -76,7 +77,7 @@ func buildPostableAlertData(ev *kube.EnhancedEvent) (*models.PostableAlert, erro
 		buildInputLabelsField("alertname", "eventexporter"),
 		buildInputLabelsField("type", ev.Event.Type),
 		buildInputLabelsField("cluster", ev.Event.ClusterName),
-		buildInputLabelsField("kind", ev.Event.Kind),
+		buildInputLabelsField("kind", ev.Event.InvolvedObject.Kind),
 		buildInputLabelsField("reason", ev.Event.Reason),
 		buildInputLabelsField("name", ev.Event.Name),
 		buildInputLabelsField("namespace", ev.Namespace),
@@ -84,8 +85,10 @@ func buildPostableAlertData(ev *kube.EnhancedEvent) (*models.PostableAlert, erro
 		buildInputLabelsField("message", ev.Event.Message),
 		buildInputLabelsField("component", ev.Event.Source.Component),
 		buildInputLabelsField("host", ev.Event.Source.Host),
-		buildInputLabelsField("ape", ev.Labels["app"]),
-		buildInputLabelsField("group", ev.Labels["sym-group"]),
+	}
+	if len(ev.Labels) > 0 {
+		labelsSlice = append(labelsSlice, buildInputLabelsField("app", ev.Labels["app"]))
+		labelsSlice = append(labelsSlice, buildInputLabelsField("group", ev.Labels["sym-group"]))
 	}
 	labels, err := parseLabels(labelsSlice)
 	if err != nil {
@@ -93,7 +96,7 @@ func buildPostableAlertData(ev *kube.EnhancedEvent) (*models.PostableAlert, erro
 	}
 
 	annotationsSlice := []string{
-		// buildInputLabelsField("message", ev.Event.Message),
+		buildInputLabelsField("message", ev.Event.Message),
 	}
 	annotations, err := parseLabels(annotationsSlice)
 	if err != nil {
@@ -107,7 +110,7 @@ func buildPostableAlertData(ev *kube.EnhancedEvent) (*models.PostableAlert, erro
 		},
 		Annotations: annotations,
 		StartsAt:    strfmt.DateTime(ev.Event.CreationTimestamp.Time),
-		EndsAt:      strfmt.DateTime(ev.Event.LastTimestamp.Time),
+		EndsAt:      strfmt.DateTime(ev.Event.LastTimestamp.Time.Add(time.Minute * 5)),
 	}
 
 	return pa, nil

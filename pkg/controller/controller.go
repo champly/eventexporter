@@ -8,10 +8,19 @@ import (
 	"github.com/champly/eventexporter/pkg/exporter"
 	"github.com/champly/eventexporter/pkg/kube"
 	"github.com/symcn/api"
+	"github.com/symcn/pkg/clustermanager"
+	"github.com/symcn/pkg/clustermanager/configuration"
 	corev1 "k8s.io/api/core/v1"
 	apierrors "k8s.io/apimachinery/pkg/api/errors"
 	"k8s.io/klog/v2"
 	"k8s.io/utils/trace"
+)
+
+var (
+	ClusterCfgManagerCMNamespace = "default"
+	ClusterCfgManagerCMLabels    = []string{"clusterowner=eventexporter"}
+	ClusterCfgManagerCMDataKey   = "kubeconfig.yaml"
+	ClusterCfgManagerCMStatusKey = "status"
 )
 
 type Controller struct {
@@ -23,7 +32,23 @@ type Controller struct {
 	sync.Mutex
 }
 
-func New(ctx context.Context, mc api.MultiMingleClient) (*Controller, error) {
+func New(ctx context.Context, mcc *clustermanager.MultiClientConfig) (*Controller, error) {
+	mcc.ClusterCfgManager = configuration.NewClusterCfgManagerWithCM(
+		kube.ManagerPlaneClusterClient.GetKubeInterface(),
+		ClusterCfgManagerCMNamespace,
+		transformLabelsArrayToMap(ClusterCfgManagerCMLabels),
+		ClusterCfgManagerCMDataKey,
+		ClusterCfgManagerCMStatusKey,
+	)
+	cc, err := clustermanager.Complete(mcc)
+	if err != nil {
+		return nil, err
+	}
+	mc, err := cc.New()
+	if err != nil {
+		return nil, err
+	}
+
 	// build exporter engine
 	engine, err := exporter.NewEngine()
 	if err != nil {
@@ -53,14 +78,14 @@ func (ctrl *Controller) Reconcile(req api.WrapNamespacedName) (requeue api.NeedR
 		trace.Field{Key: "name", Value: req.Name},
 	)
 	defer tr.LogIfLong(time.Millisecond * 100)
+	// tr.Log()
 
-	tr.Step("GetClientWithName")
 	cli, err := ctrl.GetWithName(req.QName)
 	if err != nil {
 		return api.Requeue, time.Second * 5, err
 	}
+	tr.Step("GetClientWithName")
 
-	tr.Step("GetEventWithInformer")
 	e := &corev1.Event{}
 	err = cli.Get(req.NamespacedName, e)
 	if err != nil {
@@ -71,56 +96,39 @@ func (ctrl *Controller) Reconcile(req api.WrapNamespacedName) (requeue api.NeedR
 		}
 		return api.Requeue, time.Second * 5, err
 	}
+	tr.Step("GetEventWithInformer")
 	if time.Now().Sub(e.LastTimestamp.Time) > time.Second*5 {
-		klog.V(3).Infof("Event %s/%s last time is %s skip.", e.Namespace, e.Name, e.LastTimestamp.Time.Format("2006-01-02 15:04:05"))
+		klog.Infof("Event %s/%s last time is %s skip.", e.Namespace, e.Name, e.LastTimestamp.Time.Format("2006-01-02 15:04:05"))
 		return
 	}
 
 	// build enhanced event
-	tr.Step("DeepCopy")
 	ev := &kube.EnhancedEvent{Event: *e.DeepCopy()}
 	ev.Event.ObjectMeta.ClusterName = req.QName
+	tr.Step("DeepCopy")
 
-	tr.Step("GetLabels")
-	ev.InvolvedObject.Labels = ctrl.getLabels(req, e)
-	tr.Step("GetAnnotations")
-	ev.InvolvedObject.Annotations = ctrl.getAnnotation(req, e)
+	ev.InvolvedObject.Labels, ev.InvolvedObject.Annotations = ctrl.getLabelsAndAnnotations(req, e)
+	tr.Step("GetLabelsAndAnnotations")
 
 	klog.V(4).Infof("Send enhanced event %s/%s to engine.", ev.Namespace, ev.Name)
-	tr.Step("Send Event")
 	ctrl.engine.OnEvent(ev)
+	tr.Step("Send Event")
 
 	return api.Done, 0, nil
 }
 
-func (ctrl *Controller) getLabels(req api.WrapNamespacedName, evt *corev1.Event) map[string]string {
+func (ctrl *Controller) getLabelsAndAnnotations(req api.WrapNamespacedName, evt *corev1.Event) (map[string]string, map[string]string) {
 	handler, ok := ctrl.metadataHandler[req.QName]
 	if !ok {
-		klog.Warningf("Cluster [%s] labels cache not found", req.QName)
-		return nil
+		klog.Warningf("Cluster [%s] metadata handler not found", req.QName)
+		return nil, nil
 	}
 
-	labels, err := handler.GetLabels(&evt.InvolvedObject)
+	labels, annotations, err := handler.GetlabelsAndAnnotations(&evt.InvolvedObject)
 	if err != nil {
 		// ignoring error, but log it anyways
 		klog.Errorf("Cannot list cluster [%s] labels of the objects: %s", req.QName, err)
-		return nil
+		return nil, nil
 	}
-	return labels
-}
-
-func (ctrl *Controller) getAnnotation(req api.WrapNamespacedName, evt *corev1.Event) map[string]string {
-	handler, ok := ctrl.metadataHandler[req.QName]
-	if !ok {
-		klog.Warningf("Cluster [%s] annotations cache not found", req.QName)
-		return nil
-	}
-
-	annotations, err := handler.GetAnnotations(&evt.InvolvedObject)
-	if err != nil {
-		// ignoring error, but log it anyways
-		klog.Errorf("Cannot list cluster [%s] annotations of the objects: %s", req.QName, err)
-		return nil
-	}
-	return annotations
+	return labels, annotations
 }

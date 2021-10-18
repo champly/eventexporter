@@ -74,6 +74,23 @@ func (m *MetadataHandler) GetLabels(reference *corev1.ObjectReference) (map[stri
 	return obj.GetLabels(), nil
 }
 
+func (m *MetadataHandler) GetlabelsAndAnnotations(reference *corev1.ObjectReference) (labels map[string]string, annotations map[string]string, err error) {
+	obj, err := m.getUnstructedWithObjectReference(reference)
+	if err != nil {
+		return nil, nil, err
+	}
+
+	labels = obj.GetLabels()
+	// filter annotations
+	annotations = obj.GetAnnotations()
+	for key := range annotations {
+		if strings.Contains(key, "kubernetes.io/") || strings.Contains(key, "k8s.io/") {
+			delete(annotations, key)
+		}
+	}
+	return labels, annotations, nil
+}
+
 func (m *MetadataHandler) getUnstructedWithObjectReference(reference *corev1.ObjectReference) (*unstructured.Unstructured, error) {
 	// build generic informer
 	informer, err := m.getGenericInfomer(reference)

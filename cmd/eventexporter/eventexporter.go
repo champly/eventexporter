@@ -6,7 +6,6 @@ import (
 	"github.com/champly/eventexporter/pkg/kube"
 	"github.com/spf13/cobra"
 	"github.com/symcn/pkg/clustermanager"
-	"github.com/symcn/pkg/clustermanager/configuration"
 	"sigs.k8s.io/controller-runtime/pkg/manager/signals"
 )
 
@@ -26,19 +25,8 @@ func NewEventExporter() *cobra.Command {
 				return err
 			}
 
-			clustercfgManager := configuration.NewClusterCfgManagerWithCM(kube.ManagerPlaneClusterClient.GetKubeInterface(), "sym-admin", map[string]string{"ClusterOwner": "sym-admin"}, "kubeconfig.yaml", "status")
-			mcc.ClusterCfgManager = clustercfgManager
-			cc, err := clustermanager.Complete(mcc)
-			if err != nil {
-				return err
-			}
-
-			mc, err := cc.New()
-			if err != nil {
-				return err
-			}
-
-			ctrl, err := controller.New(ctx, mc)
+			// build controller
+			ctrl, err := controller.New(ctx, mcc)
 			if err != nil {
 				return err
 			}
@@ -51,6 +39,12 @@ func NewEventExporter() *cobra.Command {
 
 	// exporter
 	cmd.PersistentFlags().StringVarP(&exporter.ConfigPath, "exporter_config_path", "", exporter.ConfigPath, "Exported config path which can define multi receiver and filter rule with yaml format.")
+
+	// cluster configuration manager config
+	cmd.PersistentFlags().StringVarP(&controller.ClusterCfgManagerCMNamespace, "ccm_namespace", "", controller.ClusterCfgManagerCMNamespace, "Multi cluster manager connect info, filter configmap with namespace.")
+	cmd.PersistentFlags().StringArrayVar(&controller.ClusterCfgManagerCMLabels, "ccm_labels", controller.ClusterCfgManagerCMLabels, "Multi cluster manager connect info get form configmap with labels.")
+	cmd.PersistentFlags().StringVarP(&controller.ClusterCfgManagerCMDataKey, "ccm_data_key", "", controller.ClusterCfgManagerCMDataKey, "Multi cluster manager connect info get form configmap with data_key.")
+	cmd.PersistentFlags().StringVarP(&controller.ClusterCfgManagerCMStatusKey, "ccm_stats_key", "", controller.ClusterCfgManagerCMStatusKey, "Multi cluster manager connect info form configmap with status.")
 
 	// multi client
 	cmd.PersistentFlags().DurationVarP(&mcc.RebuildInterval, "rebuild_interval", "", mcc.RebuildInterval, "Auto invoke multiclusterconfiguration find new cluster or delete old cluster time interval.")

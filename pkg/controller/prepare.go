@@ -48,6 +48,19 @@ func (ctrl *Controller) registryBeforAfterHandler() {
 	})
 }
 
+func transformLabelsArrayToMap(ss []string) map[string]string {
+	labels := make(map[string]string, len(ss))
+	for _, s := range ss {
+		t := strings.Split(s, "=")
+		if len(t) < 2 {
+			klog.Warningf("args --mcc_labels %s is not key=data, skip it.", s)
+			continue
+		}
+		labels[t[0]] = labels[t[1]]
+	}
+	return labels
+}
+
 // startMetricsServer start http server with prometheus route
 func startMetricsServer(ctx context.Context) {
 	server := &http.Server{

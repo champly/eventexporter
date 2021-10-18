@@ -26,8 +26,10 @@ func (r *Route) ProcessEvent(ev *kube.EnhancedEvent) {
 
 	// It has match rules, it should go to the matchers
 	matchedAll := true
+	noMatched := true
 	for _, rule := range r.Match {
 		if rule.MatchesEvent(ev) {
+			noMatched = false
 			if rule.Receiver != "" {
 				klog.V(4).Infof("Send event %s/%s to %s receiver.", ev.Namespace, ev.Name, rule.Receiver)
 				sinks.SendEvent(rule.Receiver, ev)
@@ -36,6 +38,9 @@ func (r *Route) ProcessEvent(ev *kube.EnhancedEvent) {
 		} else {
 			matchedAll = false
 		}
+	}
+	if noMatched {
+		klog.V(3).Infof("All rule not matched, not send this event: %+v", ev)
 	}
 
 	// If all matches are satisfied, we can send them down to the rabbit hole
