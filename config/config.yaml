@@ -4,15 +4,15 @@ route:
     - match:
         - receiver: "alertmanager"
           type: "Warning"
-          count: 10
+          minCount: 10
     - match:
         - receiver: "alertmanager"
           type: "Normal"
-          reason: ".*?above target$"
+          message: ".*?above target$"
     - match:
         - receiver: "alertmanager"
           type: "Normal"
-          reason: ".*?below target$"
+          message: ".*?below target$"
 receiverConfigs:
   - name: alertmanager
     config:
