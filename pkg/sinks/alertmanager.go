@@ -5,7 +5,6 @@ import (
 	"errors"
 	"fmt"
 	"net/url"
-	"strconv"
 	"strings"
 	"time"
 
@@ -22,13 +21,34 @@ import (
 
 const AlertmanagerSinkName = "alertmanager"
 
+var (
+	defaultLayoutLabelMap = map[string]string{
+		"alertname": "eventexporter",
+		"type":      "{{ .Event.Type }}",
+		"cluster":   "{{ .Event.ClusterName }}",
+		"kind":      "{{ .Event.InvolvedObject.Kind }}",
+		"reason":    "{{ .Event.Reason }}",
+		"name":      "{{ .Event.Name }}",
+		"namespace": "{{ .Event.Namespace }}",
+		"count":     "{{ .Event.Count }}",
+		"message":   "{{ .Event.Message }}",
+		"component": "{{ .Event.Source.Component }}",
+		"host":      "{{ .Event.Source.Host }}",
+	}
+
+	defaultLayoutAnnotationMap = map[string]string{
+		"message": "{{ .Event.Message }}",
+	}
+)
+
 func init() {
 	factory[AlertmanagerSinkName] = NewAlertmanagerSink
 }
 
 type alertmanagerConfig struct {
-	Host    string            `yaml:"host"`
-	Headers map[string]string `yaml:"headers"`
+	Host             string            `yaml:"host"`
+	LabelLayout      map[string]string `yaml:"laybelLayout"`
+	AnnotationLayout map[string]string `yaml:"annotationLayout"`
 }
 
 type alertmanager struct {
@@ -50,7 +70,7 @@ func NewAlertmanagerSink(cfg interface{}) (Sink, error) {
 }
 
 func (am *alertmanager) Send(ctx context.Context, ev *kube.EnhancedEvent) error {
-	pa, err := buildPostableAlertData(ev)
+	pa, err := am.buildPostableAlertData(ev)
 	if err != nil {
 		return err
 	}
@@ -72,33 +92,13 @@ func (alert *alertmanager) Close() {
 	// TODO: close connected.
 }
 
-func buildPostableAlertData(ev *kube.EnhancedEvent) (*models.PostableAlert, error) {
-	labelsSlice := []string{
-		buildInputLabelsField("alertname", "eventexporter"),
-		buildInputLabelsField("type", ev.Event.Type),
-		buildInputLabelsField("cluster", ev.Event.ClusterName),
-		buildInputLabelsField("kind", ev.Event.InvolvedObject.Kind),
-		buildInputLabelsField("reason", ev.Event.Reason),
-		buildInputLabelsField("name", ev.Event.Name),
-		buildInputLabelsField("namespace", ev.Namespace),
-		buildInputLabelsField("count", strconv.Itoa(int(ev.Event.Count))),
-		buildInputLabelsField("message", ev.Event.Message),
-		buildInputLabelsField("component", ev.Event.Source.Component),
-		buildInputLabelsField("host", ev.Event.Source.Host),
-	}
-	if len(ev.Labels) > 0 {
-		labelsSlice = append(labelsSlice, buildInputLabelsField("app", ev.Labels["app"]))
-		labelsSlice = append(labelsSlice, buildInputLabelsField("group", ev.Labels["sym-group"]))
-	}
-	labels, err := parseLabels(labelsSlice)
+func (am *alertmanager) buildPostableAlertData(ev *kube.EnhancedEvent) (*models.PostableAlert, error) {
+	labels, err := parseLabels(ev, defaultLayoutLabelMap, am.LabelLayout)
 	if err != nil {
 		return nil, err
 	}
 
-	annotationsSlice := []string{
-		buildInputLabelsField("message", ev.Event.Message),
-	}
-	annotations, err := parseLabels(annotationsSlice)
+	annotations, err := parseLabels(ev, defaultLayoutAnnotationMap, am.AnnotationLayout)
 	if err != nil {
 		return nil, err
 	}
@@ -170,16 +170,16 @@ func buildInputLabelsField(name, value string) string {
 }
 
 // parseLabels parses a list of labels (cli arguments).
-func parseLabels(inputLabels []string) (models.LabelSet, error) {
-	labelSet := make(models.LabelSet, len(inputLabels))
+func parseLabels(ev *kube.EnhancedEvent, inputLabels ...map[string]string) (models.LabelSet, error) {
+	labelSet := make(models.LabelSet)
 
-	for _, l := range inputLabels {
-		tmp := strings.Split(l, "=")
-		if len(tmp) != 2 {
-			klog.V(4).Infof("inputLabels %s is not key=value and both not empty, skip it.", l)
-			continue
+	for _, inputLabel := range inputLabels {
+		for key, value := range inputLabel {
+			m, _ := getLayoutString(ev, value)
+			if len(m) > 0 {
+				labelSet[key] = m
+			}
 		}
-		labelSet[tmp[0]] = tmp[1]
 	}
 
 	return labelSet, nil

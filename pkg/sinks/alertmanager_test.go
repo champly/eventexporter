@@ -30,8 +30,8 @@ func TestSendToAlertManager(t *testing.T) {
 
 	// t.Log(r.Error())
 
-	labels, _ := parseLabels([]string{"alertname=123", "l1=v1", "l2=v2"})
-	annotations, _ := parseLabels([]string{"a1=v1", "a2=v2"})
+	labels, _ := parseLabels(nil, map[string]string{"alertname": "123", "l1": "v1", "l2": "v2"})
+	annotations, _ := parseLabels(nil, map[string]string{"a1": "v1", "a2": "v2"})
 
 	pa := &models.PostableAlert{
 		Alert: models.Alert{

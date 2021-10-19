@@ -22,3 +22,9 @@ data:
               message: ".*?below target$"
     receiverConfigs:
       - name: alertmanager
+        config:
+          laybelLayout:
+            app: "{{ .InvolvedObject.Labels.app }}"
+            group: "{{ .InvolvedObject.Labels.sym-group }}"
+          annotationLayout:
+            group: "{{ .InvolvedObject.Labels.sym-group }}"

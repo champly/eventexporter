@@ -9,8 +9,9 @@ import (
 	"github.com/champly/eventexporter/pkg/kube"
 )
 
-func GetString(ev *kube.EnhancedEvent, text string) (string, error) {
-	tmpl, err := template.New("template").Funcs(sprig.TxtFuncMap()).Parse(text)
+func getLayoutString(ev *kube.EnhancedEvent, text string) (string, error) {
+	// https://stackoverflow.com/questions/49933684/prevent-no-value-being-inserted-by-golang-text-template-library
+	tmpl, err := template.New("template").Funcs(sprig.TxtFuncMap()).Option("missingkey=zero").Parse(text)
 	if err != nil {
 		return "", nil
 	}
@@ -41,7 +42,7 @@ func convertLayoutTemplate(layout map[string]interface{}, ev *kube.EnhancedEvent
 func convertTemplate(value interface{}, ev *kube.EnhancedEvent) (interface{}, error) {
 	switch v := value.(type) {
 	case string:
-		rendered, err := GetString(ev, v)
+		rendered, err := getLayoutString(ev, v)
 		if err != nil {
 			return nil, err
 		}
