@@ -18,7 +18,6 @@ import (
 func (ctrl *Controller) registryBeforAfterHandler() {
 	// start metrics server & probe server
 	go startMetricsServer(ctrl.ctx)
-	go startProbleCheck(ctrl.ctx)
 
 	ctrl.RegistryBeforAfterHandler(func(ctx context.Context, cli api.MingleClient) error {
 		// build queue
@@ -71,6 +70,7 @@ func startMetricsServer(ctx context.Context) {
 	metrics.RegisterHTTPHandler(func(pattern string, handler http.Handler) {
 		mux.Handle(pattern, handler)
 	})
+	registryProbleCheck(mux)
 	server.Handler = mux
 
 	go func() {
