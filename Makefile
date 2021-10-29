@@ -27,11 +27,18 @@ build-push: build
 	docker build -t ${IMG}:${VERSION} -f ./Dockerfile .
 	docker push ${IMG}:${VERSION}
 
+build-local:
+	CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -o bin/eventexporter cmd/main.go
+
 # Build the docker image
 docker-build:
 	docker run --rm -v "$$PWD":/go/src/${ROOT} -v "$$PWD"/mod:/go/pkg/mod -w /go/src/${ROOT} golang:${GO_VERSION} make build
 
 docker-build-push: docker-build
+	docker build -t ${IMG}:${VERSION} -f ./Dockerfile .
+	docker push ${IMG}:${VERSION}
+
+local-build-push: build-local
 	docker build -t ${IMG}:${VERSION} -f ./Dockerfile .
 	docker push ${IMG}:${VERSION}
 
