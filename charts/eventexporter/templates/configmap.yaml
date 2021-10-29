@@ -24,7 +24,7 @@ data:
       - name: alertmanager
         config:
           laybelLayout:
-            app: "{{ .InvolvedObject.Labels.app }}"
-            group: "{{ .InvolvedObject.Labels.sym-group }}"
+            app: "{{ "{{" }} .InvolvedObject.Labels.app {{ "}}" }}"
+            group: "{{ "{{" }} .InvolvedObject.Labels.sym-group {{ "}}" }}"
           annotationLayout:
-            group: "{{ .InvolvedObject.Labels.sym-group }}"
+            group: "{{ "{{" }} .InvolvedObject.Labels.sym-group {{ "}}" }}"
