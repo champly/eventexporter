@@ -71,6 +71,7 @@ func startMetricsServer(ctx context.Context) {
 		mux.Handle(pattern, handler)
 	})
 	registryProbleCheck(mux)
+	initDebug(mux)
 	server.Handler = mux
 
 	go func() {

@@ -57,13 +57,13 @@ var (
 )
 
 func registryProbleCheck(mux *http.ServeMux) {
-}
-
-func initDebug(mux *http.ServeMux) {
 	mux.HandleFunc("/", func(rw http.ResponseWriter, r *http.Request) {
 		rw.WriteHeader(http.StatusOK)
 		fmt.Fprint(rw, "ok")
 	})
+}
+
+func initDebug(mux *http.ServeMux) {
 
 	mux.HandleFunc("/debug", debugHandler)
 
