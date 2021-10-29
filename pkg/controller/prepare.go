@@ -2,6 +2,7 @@ package controller
 
 import (
 	"context"
+	"fmt"
 	"net/http"
 	"strings"
 
@@ -13,6 +14,10 @@ import (
 	"github.com/symcn/pkg/metrics"
 	corev1 "k8s.io/api/core/v1"
 	"k8s.io/klog/v2"
+)
+
+var (
+	HttpPort = 80
 )
 
 func (ctrl *Controller) registryBeforAfterHandler() {
@@ -64,7 +69,7 @@ func transformLabelsArrayToMap(ss []string) map[string]string {
 // startMetricsServer start http server with prometheus route
 func startMetricsServer(ctx context.Context) {
 	server := &http.Server{
-		Addr: ":18080",
+		Addr: fmt.Sprintf(":%d", HttpPort),
 	}
 	mux := http.NewServeMux()
 	metrics.RegisterHTTPHandler(func(pattern string, handler http.Handler) {

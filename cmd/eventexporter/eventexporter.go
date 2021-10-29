@@ -40,6 +40,9 @@ func NewEventExporter() *cobra.Command {
 	// exporter
 	cmd.PersistentFlags().StringVarP(&exporter.ConfigPath, "exporter_config_path", "", exporter.ConfigPath, "Exported config path which can define multi receiver and filter rule with yaml format.")
 
+	// controller
+	cmd.PersistentFlags().IntVarP(&controller.HttpPort, "http_port", "", controller.HttpPort, "Controller http port witch provide metrics, health, ready and debug.")
+
 	// cluster configuration manager config
 	cmd.PersistentFlags().StringVarP(&controller.ClusterCfgManagerCMNamespace, "ccm_namespace", "", controller.ClusterCfgManagerCMNamespace, "Multi cluster manager connect info, filter configmap with namespace.")
 	cmd.PersistentFlags().StringArrayVar(&controller.ClusterCfgManagerCMLabels, "ccm_labels", controller.ClusterCfgManagerCMLabels, "Multi cluster manager connect info get form configmap with labels.")
