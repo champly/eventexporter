@@ -23,7 +23,7 @@ func TransformRuntimeObjToUnstructured(obj runtime.Object) (*unstructured.Unstru
 	return unstructObj, nil
 }
 
-func GetGKandVersion(reference *corev1.ObjectReference) (schema.GroupKind, string) {
+func GetGKindVersion(reference *corev1.ObjectReference) (schema.GroupKind, string) {
 	var group, version string
 	s := strings.Split(reference.APIVersion, "/")
 	if len(s) == 1 {

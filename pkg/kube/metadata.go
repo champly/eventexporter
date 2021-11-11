@@ -115,7 +115,7 @@ func (m *MetadataHandler) getUnstructedWithObjectReference(reference *corev1.Obj
 }
 
 func (m *MetadataHandler) getGenericInfomer(reference *corev1.ObjectReference) (informers.GenericInformer, error) {
-	gk, v := GetGKandVersion(reference)
+	gk, v := GetGKindVersion(reference)
 	mapping, err := m.rm.RESTMapping(gk, v)
 	if err != nil {
 		return nil, err
