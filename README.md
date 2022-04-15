@@ -1,6 +1,6 @@
 # eventexporter
 
-![Open in Visual StudioCode](https://open.vscode.dev/badges/open-in-vscode.svg)](https://open.vscode.dev/champly/eventexporter)
+[![Open in Visual StudioCode](https://open.vscode.dev/badges/open-in-vscode.svg)](https://open.vscode.dev/champly/eventexporter)
 
 Multi kubernetes cluster event exporter to sink (alertmanager).
 
