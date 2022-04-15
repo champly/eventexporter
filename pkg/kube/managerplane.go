@@ -5,7 +5,7 @@ import (
 	"fmt"
 
 	"github.com/symcn/api"
-	"github.com/symcn/pkg/clustermanager"
+	"github.com/symcn/pkg/clustermanager/client"
 	"github.com/symcn/pkg/clustermanager/configuration"
 )
 
@@ -18,9 +18,9 @@ var (
 // default use current env kubeconfig
 // TODO: support kubeconfig configuration
 func InitManagerPlaneClusterClient(ctx context.Context) (err error) {
-	ManagerPlaneClusterClient, err = clustermanager.NewMingleClient(
+	ManagerPlaneClusterClient, err = client.NewMingleClient(
 		configuration.BuildDefaultClusterCfgInfo(ManagerPlaneName),
-		clustermanager.DefaultOptions(),
+		client.DefaultOptions(),
 	)
 	if err != nil {
 		return fmt.Errorf("init manager-plane cluster client failed: %s", err.Error())

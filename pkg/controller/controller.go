@@ -8,7 +8,7 @@ import (
 	"github.com/champly/eventexporter/pkg/exporter"
 	"github.com/champly/eventexporter/pkg/kube"
 	"github.com/symcn/api"
-	"github.com/symcn/pkg/clustermanager"
+	"github.com/symcn/pkg/clustermanager/client"
 	"github.com/symcn/pkg/clustermanager/configuration"
 	corev1 "k8s.io/api/core/v1"
 	apierrors "k8s.io/apimachinery/pkg/api/errors"
@@ -32,7 +32,7 @@ type Controller struct {
 	sync.Mutex
 }
 
-func New(ctx context.Context, mcc *clustermanager.MultiClientConfig) (*Controller, error) {
+func New(ctx context.Context, mcc *client.MultiClientConfig) (*Controller, error) {
 	mcc.ClusterCfgManager = configuration.NewClusterCfgManagerWithCM(
 		kube.ManagerPlaneClusterClient.GetKubeInterface(),
 		ClusterCfgManagerCMNamespace,
@@ -40,7 +40,7 @@ func New(ctx context.Context, mcc *clustermanager.MultiClientConfig) (*Controlle
 		ClusterCfgManagerCMDataKey,
 		ClusterCfgManagerCMStatusKey,
 	)
-	cc, err := clustermanager.Complete(mcc)
+	cc, err := client.Complete(mcc)
 	if err != nil {
 		return nil, err
 	}

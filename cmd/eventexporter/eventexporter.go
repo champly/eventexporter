@@ -5,12 +5,12 @@ import (
 	"github.com/champly/eventexporter/pkg/exporter"
 	"github.com/champly/eventexporter/pkg/kube"
 	"github.com/spf13/cobra"
-	"github.com/symcn/pkg/clustermanager"
+	"github.com/symcn/pkg/clustermanager/client"
 	"sigs.k8s.io/controller-runtime/pkg/manager/signals"
 )
 
 func NewEventExporter() *cobra.Command {
-	mcc := clustermanager.NewMultiClientConfig()
+	mcc := client.NewMultiClientConfig()
 	cmd := &cobra.Command{
 		Use:          "event",
 		Short:        "Event exporter",
