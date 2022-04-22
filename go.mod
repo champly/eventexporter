@@ -9,8 +9,8 @@ require (
 	github.com/spf13/cobra v1.2.1
 	github.com/spf13/pflag v1.0.5
 	github.com/stretchr/testify v1.7.0
-	github.com/symcn/api v0.0.0-20220415082853-88bceb086af6
-	github.com/symcn/pkg v0.0.0-20220415093511-230cc81732c4
+	github.com/symcn/api v0.0.0-20220422083802-5e0c32b768cc
+	github.com/symcn/pkg v0.0.0-20220422084103-685cc01d7d27
 	gopkg.in/yaml.v2 v2.4.0
 	gopkg.in/yaml.v3 v3.0.0-20210107192922-496545a6307b
 	k8s.io/api v0.23.5
