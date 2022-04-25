@@ -1302,10 +1302,10 @@ github.com/stretchr/testify v1.6.1/go.mod h1:6Fq8oRcR53rry900zMqJjRRixrwX3KX962/
 github.com/stretchr/testify v1.7.0 h1:nwc3DEeHmmLAfoZucVR881uASk0Mfjw8xYJ99tb5CcY=
 github.com/stretchr/testify v1.7.0/go.mod h1:6Fq8oRcR53rry900zMqJjRRixrwX3KX962/h/Wwjteg=
 github.com/subosito/gotenv v1.2.0/go.mod h1:N0PQaV/YGNqwC0u51sEeR/aUtSLEXKX9iv69rRypqCw=
-github.com/symcn/api v0.0.0-20220424064502-d5730c43c777 h1:TKtD+KH/Hd1oPK+cnaR/nkdAY3eN7vg3yG48tyHhxKA=
-github.com/symcn/api v0.0.0-20220424064502-d5730c43c777/go.mod h1:G03tS0wAvGKNAcu/pAKt1aKkAwc6s2Vh3tQa56yyv2A=
-github.com/symcn/pkg v0.0.0-20220424065049-fd5f98de161a h1:LOvkhb7gmRGlI/OQgRdLHzMpfeDhnpMHVXZPqqvOkKs=
-github.com/symcn/pkg v0.0.0-20220424065049-fd5f98de161a/go.mod h1:MFUckX7MmT6MsQrYGe9rwblnuO0MWlrSlxO4kaxiAl0=
+github.com/symcn/api v0.0.0-20220425085530-54887225fdb2 h1:jwEYElK3BmG6V1pacuagdyrL35rwbc0Y1bK4K6CvD1s=
+github.com/symcn/api v0.0.0-20220425085530-54887225fdb2/go.mod h1:G03tS0wAvGKNAcu/pAKt1aKkAwc6s2Vh3tQa56yyv2A=
+github.com/symcn/pkg v0.0.0-20220425085745-9f7f20e829f0 h1:8ZanVdXx/PhqB8+lQL6f60nuuGRDjHeQmd0TzxIJ6VQ=
+github.com/symcn/pkg v0.0.0-20220425085745-9f7f20e829f0/go.mod h1:aPOBr7EPZ2xovU627BJBHVThZb3kFUaxiFyKqrGtYOc=
 github.com/syndtr/gocapability v0.0.0-20170704070218-db04d3cc01c8/go.mod h1:hkRG7XYTFWNJGYcbNJQlaLq0fg1yr4J4t/NcTQtrfww=
 github.com/syndtr/gocapability v0.0.0-20180916011248-d98352740cb2/go.mod h1:hkRG7XYTFWNJGYcbNJQlaLq0fg1yr4J4t/NcTQtrfww=
 github.com/syndtr/gocapability v0.0.0-20200815063812-42c35b437635/go.mod h1:hkRG7XYTFWNJGYcbNJQlaLq0fg1yr4J4t/NcTQtrfww=

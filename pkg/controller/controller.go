@@ -71,7 +71,7 @@ func (ctrl *Controller) Start() error {
 	return ctrl.MultiMingleClient.Start(ctrl.ctx)
 }
 
-func (ctrl *Controller) Reconcile(req api.WrapNamespacedName) (requeue api.NeedRequeue, after time.Duration, err error) {
+func (ctrl *Controller) Reconcile(ctx context.Context, req api.WrapNamespacedName) (requeue api.NeedRequeue, after time.Duration, err error) {
 	tr := trace.New("event-exporter-controller",
 		trace.Field{Key: "cluster", Value: req.QName},
 		trace.Field{Key: "namespace", Value: req.Namespace},
