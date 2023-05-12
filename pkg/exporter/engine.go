@@ -26,7 +26,7 @@ type Engine struct {
 func NewEngine() (*Engine, error) {
 	b, err := ioutil.ReadFile(ConfigPath)
 	if err != nil {
-		return nil, fmt.Errorf("Read exporter config %s failed: %+v", ConfigPath, err)
+		return nil, fmt.Errorf("read exporter config %s failed: %+v", ConfigPath, err)
 	}
 	cfg := &Config{}
 	err = yaml.Unmarshal(b, cfg)

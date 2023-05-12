@@ -24,7 +24,7 @@ func (ctrl *Controller) registryBeforAfterHandler() {
 	// start metrics server & probe server
 	go startMetricsServer(ctrl.ctx)
 
-	ctrl.RegistryBeforAfterHandler(func(ctx context.Context, cli api.MingleClient) error {
+	ctrl.RegistryBeforeStartHandler(func(ctx context.Context, cli api.MingleClient) error {
 		// build queue
 		queue, err := workqueue.Completed(workqueue.NewWrapQueueConfig(cli.GetClusterCfgInfo().GetName(), ctrl)).NewQueue()
 		if err != nil {

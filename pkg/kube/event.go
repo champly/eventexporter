@@ -15,6 +15,7 @@ type EnhancedEvent struct {
 type EnhancedObjectReference struct {
 	Labels      map[string]string `json:"labels,omitempty"`
 	Annotations map[string]string `json:"annotations,omitempty"`
+	ClusterName string            `json:"clusterName,omitempty"`
 }
 
 // ToJSON does not return an error because we are %99 confident it is JSON serializable.

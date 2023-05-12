@@ -21,10 +21,10 @@ var (
 func InitReceiver(cfg ReceiverConfig) error {
 	f, ok := factory[cfg.Name]
 	if !ok {
-		return fmt.Errorf("Not found %s receiver init function.", cfg.Name)
+		return fmt.Errorf("not found %s receiver init function", cfg.Name)
 	}
 	if _, ok := initedReceiver[cfg.Name]; ok {
-		return fmt.Errorf("Receiver %s repeat initialization.", cfg.Name)
+		return fmt.Errorf("receiver %s repeat initialization", cfg.Name)
 	}
 
 	sink, err := f(cfg.Config)

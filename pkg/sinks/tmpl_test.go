@@ -19,8 +19,7 @@ func TestLayoutConvert(t *testing.T) {
 	ev.FirstTimestamp = metav1.Time{Time: time.Now()}
 
 	// Because Go, when parsing yaml, its []interface, not []string
-	var tagz interface{}
-	tagz = make([]interface{}, 2)
+	var tagz interface{} = make([]interface{}, 2)
 	tagz.([]interface{})[0] = "sre"
 	tagz.([]interface{})[1] = "ops"
 

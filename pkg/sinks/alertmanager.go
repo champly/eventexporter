@@ -53,7 +53,7 @@ type alertmanagerConfig struct {
 
 type alertmanager struct {
 	*alertmanagerConfig
-	amclient *client.Alertmanager
+	amclient *client.AlertmanagerAPI
 }
 
 func NewAlertmanagerSink(cfg interface{}) (Sink, error) {
@@ -84,7 +84,7 @@ func (am *alertmanager) Send(ctx context.Context, ev *kube.EnhancedEvent) error 
 		return errors.New(r.Error())
 	}
 
-	klog.Infof("Send %s -> %s/%s event success.", ev.Event.ObjectMeta.ClusterName, ev.Namespace, ev.Name)
+	klog.Infof("Send %s -> %s/%s event success.", ev.InvolvedObject.ClusterName, ev.Namespace, ev.Name)
 	return nil
 }
 
@@ -110,7 +110,7 @@ func (am *alertmanager) buildPostableAlertData(ev *kube.EnhancedEvent) (*models.
 		},
 		Annotations: annotations,
 		StartsAt:    strfmt.DateTime(ev.Event.CreationTimestamp.Time),
-		EndsAt:      strfmt.DateTime(ev.Event.LastTimestamp.Time.Add(time.Minute * 5)),
+		EndsAt:      strfmt.DateTime(ev.Event.LastTimestamp.Add(time.Minute * 5)),
 	}
 
 	return pa, nil
@@ -162,7 +162,7 @@ func getAlertManagerHost() (host string, err error) {
 		}
 	}
 
-	return "", fmt.Errorf("not found alertmanager in manager plane cluster with svc spec.selector.app == alertmanager.")
+	return "", errors.New("not found alertmanager in manager plane cluster with svc spec.selector.app == alertmanager")
 }
 
 func buildInputLabelsField(name, value string) string {
@@ -212,7 +212,7 @@ func parseLabels(ev *kube.EnhancedEvent, inputLabels ...map[string]string) (mode
  *         "endpoint": "http",
  *         "env": "prod",
  *         "hpa": "mid-cloud-test-provider-gz01b-green",
- *         "instance": "10.49.18.241:8080",
+ *         "instance": "10.48.224.79:8080",
  *         "job": "kube-state-metrics",
  *         "namespace": "default",
  *         "pod": "monitor-dev-tke-cd-mid-kube-state-metrics-7f4586c4d9-wzssg",

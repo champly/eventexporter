@@ -97,14 +97,14 @@ func (ctrl *Controller) Reconcile(ctx context.Context, req api.WrapNamespacedNam
 		return api.Requeue, time.Second * 5, err
 	}
 	tr.Step("GetEventWithInformer")
-	if time.Now().Sub(e.LastTimestamp.Time) > time.Second*5 {
+	if time.Since(e.LastTimestamp.Time) > time.Second*5 {
 		klog.Infof("Event %s/%s last time is %s skip.", e.Namespace, e.Name, e.LastTimestamp.Time.Format("2006-01-02 15:04:05"))
 		return
 	}
 
 	// build enhanced event
 	ev := &kube.EnhancedEvent{Event: *e.DeepCopy()}
-	ev.Event.ObjectMeta.ClusterName = req.QName
+	ev.InvolvedObject.ClusterName = req.QName
 	tr.Step("DeepCopy")
 
 	ev.InvolvedObject.Labels, ev.InvolvedObject.Annotations = ctrl.getLabelsAndAnnotations(req, e)

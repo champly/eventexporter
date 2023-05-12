@@ -16,7 +16,7 @@ route:
 receiverConfigs:
   - name: alertmanager
     config:
-      host: 10.49.18.83:9093
+      host: 127.0.0.1:9093
       laybelLayout:
         app: "{{ .InvolvedObject.Labels.app }}"
         group: "{{ .InvolvedObject.Labels.sym-group }}"

@@ -50,7 +50,7 @@ func NewEventExporter() *cobra.Command {
 	cmd.PersistentFlags().StringVarP(&controller.ClusterCfgManagerCMStatusKey, "ccm_stats_key", "", controller.ClusterCfgManagerCMStatusKey, "Multi cluster manager connect info form configmap with status.")
 
 	// multi client
-	cmd.PersistentFlags().DurationVarP(&mcc.RebuildInterval, "rebuild_interval", "", mcc.RebuildInterval, "Auto invoke multiclusterconfiguration find new cluster or delete old cluster time interval.")
+	cmd.PersistentFlags().DurationVarP(&mcc.FetchInterval, "fetch_interval", "", mcc.FetchInterval, "Auto invoke multiclusterconfiguration find new cluster or delete old cluster time interval.")
 	cmd.PersistentFlags().DurationVarP(&mcc.Options.ExecTimeout, "exec_timeout", "", mcc.Options.ExecTimeout, "Set mingle client exec timeout, if less than default timeout, use default.")
 	cmd.PersistentFlags().DurationVarP(&mcc.Options.HealthCheckInterval, "health_check_interval", "", mcc.Options.HealthCheckInterval, "Set mingle clinet check kubernetes connected interval.")
 	cmd.PersistentFlags().DurationVarP(&mcc.Options.SyncPeriod, "sync_period", "", mcc.Options.SyncPeriod, "Set informer sync period time interval.")

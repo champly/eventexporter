@@ -13,8 +13,7 @@ import (
 )
 
 func TestSendToAlertManager(t *testing.T) {
-
-	// r, err := client.NewHTTPClientWithConfig(nil, &client.TransportConfig{Host: "10.49.18.83:9093", BasePath: "/api/v2"}).Alert.PostAlerts(&alert.PostAlertsParams{
+	// r, err := client.NewHTTPClientWithConfig(nil, &client.TransportConfig{Host: "127.0.0.1:9093", BasePath: "/api/v2"}).Alert.PostAlerts(&alert.PostAlertsParams{
 	// Alerts: []*models.PostableAlert{
 	// {
 	// Annotations: models.LabelSet(map[string]string{"k": "v"}),
@@ -45,7 +44,7 @@ func TestSendToAlertManager(t *testing.T) {
 	alertParams := alert.NewPostAlertsParams().WithContext(context.TODO()).
 		WithAlerts(models.PostableAlerts{pa})
 
-	amclient := cli.NewAlertmanagerClient(&url.URL{Host: "10.49.18.83:9093"})
+	amclient := cli.NewAlertmanagerClient(&url.URL{Host: "127.0.0.1:9093"})
 	r, err := amclient.Alert.PostAlerts(alertParams)
 	if err != nil {
 		t.Error(err)
